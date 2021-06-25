@@ -1,26 +1,43 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  计数器: {{count}} {{$store.state.count}}
+  <!-- <hr>
+  double: {{double}} {{$store.getters.double}}
+  <hr> -->
+  <!--严格模式下会报错-->
+  <button @click="$store.state.count++">错误修改</button>
+
+  <!--同步模式-->
+  <!-- <button @click="add">同步修改</button> -->
+
+  <!--异步模式-->
+  <!-- <button @click="addSync">异步修改</button> -->
+  
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+
+import { useStore } from '@/vuex'
+import { computed } from 'vue'
 
 export default {
   name: 'App',
-  components: {
-    HelloWorld
+
+  setup(){
+    const store = useStore()
+    function add (){
+      store.commit("add", 1)
+    }
+    function addSync () {
+      store.dispatch('addSync', 1)
+    }
+    return {
+      count: computed(() => store.state.count),
+      double: computed(() => store.getters.double),
+      add,
+      addSync
+    }
+
   }
 }
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
