@@ -1,8 +1,8 @@
 <template>
   计数器: {{count}} {{$store.state.count}}
-  <!-- <hr>
+  <hr>
   double: {{double}} {{$store.getters.double}}
-  <hr> -->
+  <hr>
   <!--严格模式下会报错-->
   <button @click="$store.state.count++">错误修改</button>
 
