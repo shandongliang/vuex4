@@ -7,10 +7,10 @@
   <button @click="$store.state.count++">错误修改</button>
 
   <!--同步模式-->
-  <!-- <button @click="add">同步修改</button> -->
+  <button @click="add">同步修改</button>
 
   <!--异步模式-->
-  <!-- <button @click="addSync">异步修改</button> -->
+  <button @click="addSync">异步修改</button>
   
 </template>
 

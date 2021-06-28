@@ -13,7 +13,7 @@ class Store {
 		const store = this
 		store._state = reactive({data: options.state}) //reactive基于proxy实现响应式，data是为解决重新赋值的问题
 
-		//实现getters
+		/**实现getters **/
 		const _getters = options.getters  // {double: function => getter}
 		store.getters = {}
 
@@ -25,13 +25,41 @@ class Store {
 			})
 		})
 
+		/**实现mutations和actions **/
+		store._mutations = Object.create(null)
+		store._actions  =Object.create(null)
 
+		const _mutations = options.mutations
+		const _actions = options.actions
+
+		forEachValue(_mutations, (mutation, key) => {
+			store._mutations[key] = (payload) => {
+				mutation.call(store, store.state, payload)
+			}
+		})
+
+		forEachValue(_actions, (action, key) => {
+			store._actions[key] = (payload) => {
+				action.call(store, store, payload)
+			}
+		})
+
+	}
+
+	commit = (mutation, payload) => {
+		this._mutations[mutation](payload)
+	}
+
+	dispatch = (action, payload) => {
+		this._actions[action](payload)
 	}
 
 	// 类的属性访问器
 	get state () {
 		return this._state.data
 	}
+
+	
 
 	install(app, injectKey){
 		// vue3没有实例的概念， app是对象
