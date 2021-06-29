@@ -20,9 +20,55 @@ export default createStore({
         commit('add', payload)
       },1000)
     }
-  }
+  },
 
   // dispatch(action) -> commit(mutation)
+
+  
+  modules: { // 子模块 实现逻辑的拆分 
+    aCount: {
+        namespaced: true,
+        state: { count: 0 },
+        mutations: {
+            add(state, payload) { // aCount/add
+                state.count += payload
+            }
+        },
+        modules: {
+            cCount: {
+                namespaced:true,
+                state: { count: 0 },
+                mutations: {
+                    add(state, payload) { // aCount/cCount
+                        state.count += payload
+                    }
+                },
+                modules: {
+                  dCount: {
+                      namespaced:true,
+                      state: { count: 0 },
+                      mutations: {
+                          add(state, payload) { // aCount/cCount
+                              state.count += payload
+                          }
+                      },
+                  }
+              }
+            }
+        }
+    },
+    bCount: {
+        state: { count: 0 },
+        namespaced: true,
+        mutations: {
+            add(state, payload) {
+                state.count += payload
+            }
+        },
+    }
+
+}
+  
 })
 
 
