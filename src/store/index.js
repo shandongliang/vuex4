@@ -1,7 +1,21 @@
 import { createStore } from '@/vuex' //new Store
 
+function customPlugin (store) {
+  let local = localStorage.getItem("VUEX:STATE")
+  if(local){
+    store.replaceState(JSON.parse(local))
+  }
+  store.subscribe((mutation, state) => {
+    console.log(mutation, state)
+    localStorage.setItem("VUEX:STATE", JSON.stringify(state))
+  })
+}
+
 export default createStore({
-  strict: true,
+  plugins: [ //会按照注册的顺序依次执行，执行的时候会把store传递进来
+    customPlugin //每个插件都是一个函数
+  ],
+  strict: true, //开启严格模式，不允许永华非法操作（只能在mumation中修改状态，否则就会发生异常）
   state: {
     count: 0
   },

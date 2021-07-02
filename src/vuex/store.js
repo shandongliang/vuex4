@@ -101,11 +101,27 @@ export default class Store {
 		installModule(store, state, [], store._module.root) //安装state
 
 		resetStoreState(store, state)//把状态定义到store上
-		console.log(store)
+
+		store._subscribes = [];
+
+		//注册完状态再执行插件，这样才会有状态
+		options.plugins.forEach(option => option(store)) //插件实质上是函数
+		// console.log(store)
 	}
 
 	get state () {
 		return this._state.data
+	}
+
+	//实现订阅
+	subscribe(fn){
+		this._subscribes.push(fn)
+	}
+
+	replaceState(newState){
+		this._withCommit(() => {
+			this._state.data = newState
+		})
 	}
 
 	_withCommit (fn) { //切片
@@ -119,6 +135,7 @@ export default class Store {
 		const entry = this._mutations[type] || []
 		this._withCommit(() => {
 			entry.forEach(handler => handler(payload))
+			this._subscribes.forEach(sub => sub({type, payload}, this.state))
 		})
 	}
 
