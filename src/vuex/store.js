@@ -1,4 +1,4 @@
-import { reactive } from "vue"
+import { reactive, watch } from "vue"
 import { storeKey } from './injectKey'
 import ModuleCollection from './module/module-collection'
 import { forEachValue, isPromise } from "./utils"
@@ -58,12 +58,21 @@ function resetStoreState (store, state) {
 	const wrappedGetters = store._wrappedGetters
 	store.getters = {}
 	forEachValue(wrappedGetters, (getter, key) => {
-		console.log(key, getter)
 		Object.defineProperty(store.getters, key, {
 			get: getter,
 			enumerable: true
 		})
 	})
+	if(store._strict){
+		enableStriceMode(store)
+	}
+}
+
+// 监控数据变化
+function enableStriceMode(store){
+	watch(() => store._state.data, () => { //监控数据变化，数据变化后执行回调函数
+		console.assert(store._commiting,'Do not mutate vuex store state outside mutation handlers!')
+	},{deep:true, flush: 'sync'}) //watch默认是异步，通过flush更改成同步
 }
 
 export default class Store {
@@ -74,6 +83,18 @@ export default class Store {
 		store._wrappedGetters = Object.create(null)
 		store._mutations = Object.create(null)
 		store._actions = Object.create(null)
+
+		store._strict = options.strict || false // 是不是严格模式
+
+		// 调用的时候 知道是mutation，mutation里面要写同步代码
+
+		this._commiting = false
+
+		/**
+		 * 在mutation之前添加一个状态_commiting = true
+		 * 调用mutation ->会更改状态，监控这个状态，如果当前状态变化的时候_commiting = true,则是同步更改
+		 * _commiting = false
+		 */
 
 		//定义状态
 		const state = store._module.root.state; // 根状态
@@ -87,9 +108,18 @@ export default class Store {
 		return this._state.data
 	}
 
+	_withCommit (fn) { //切片
+		const commting = this._commiting
+		this._commiting = true
+		fn()
+		this._commiting = commting
+	}
+
 	commit = (type, payload) => {
 		const entry = this._mutations[type] || []
-		entry.forEach(handler => handler(payload))
+		this._withCommit(() => {
+			entry.forEach(handler => handler(payload))
+		})
 	}
 
 	dispatch = (type, payload) => {
