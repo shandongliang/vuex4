@@ -33,7 +33,7 @@ export default {
       store.commit("add", 1)
     }
     function addSync () {
-      store.dispatch('addSync', 1)
+      store.dispatch('addSync', 1).then(res => console.log(1))
     }
     return {
       count: computed(() => store.state.count),

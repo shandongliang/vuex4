@@ -29,6 +29,11 @@ export default createStore({
     aCount: {
         namespaced: true,
         state: { count: 0 },
+        getters: { //计算属性 vuex4 没有实现计算属性的功能
+          double1 (state) {
+            return state.count * 2
+          }
+        },
         mutations: {
             add(state, payload) { // aCount/add
                 state.count += payload
