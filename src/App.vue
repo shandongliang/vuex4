@@ -12,9 +12,10 @@
   <!--异步模式-->
   <button @click="addSync">异步修改</button>
    <hr>
-  aCount: {{aCount}} bCount:{{bCount}}
+  aCount: {{aCount}} bCount:{{bCount}} cCount:{{cCount}}
   <button @click="$store.commit('aCount/add',1)">修改a</button>
   <button @click="$store.commit('bCount/add',1)">修改b</button>
+  <button @click="$store.commit('aCount/cCount/add',1)">修改c</button>
   <hr>
   
 </template>
@@ -40,6 +41,7 @@ export default {
       double: computed(() => store.getters.double),
       aCount: computed(() => store.state.aCount.count),
       bCount: computed(() => store.state.bCount.count),
+      cCount: computed(() => store.state.aCount.cCount.count),
       add,
       addSync
     }

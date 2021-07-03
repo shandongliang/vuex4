@@ -11,9 +11,9 @@ function customPlugin (store) {
   })
 }
 
-export default createStore({
+const store = createStore({
   plugins: [ //会按照注册的顺序依次执行，执行的时候会把store传递进来
-    customPlugin //每个插件都是一个函数
+    // customPlugin //每个插件都是一个函数
   ],
   strict: true, //开启严格模式，不允许永华非法操作（只能在mumation中修改状态，否则就会发生异常）
   state: {
@@ -54,28 +54,28 @@ export default createStore({
                 state.count += payload
             }
         },
-        modules: {
-            cCount: {
-                namespaced:true,
-                state: { count: 0 },
-                mutations: {
-                    add(state, payload) { // aCount/cCount
-                        state.count += payload
-                    }
-                },
-                modules: {
-                  dCount: {
-                      namespaced:true,
-                      state: { count: 0 },
-                      mutations: {
-                          add(state, payload) { // aCount/cCount
-                              state.count += payload
-                          }
-                      },
-                  }
-              }
-            }
-        }
+        // modules: {
+        //     cCount: {
+        //         namespaced:true,
+        //         state: { count: 0 },
+        //         mutations: {
+        //             add(state, payload) { // aCount/cCount
+        //                 state.count += payload
+        //             }
+        //         },
+        //         modules: {
+        //           dCount: {
+        //               namespaced:true,
+        //               state: { count: 0 },
+        //               mutations: {
+        //                   add(state, payload) { // aCount/cCount
+        //                       state.count += payload
+        //                   }
+        //               },
+        //           }
+        //       }
+        //     }
+        // }
     },
     bCount: {
         state: { count: 0 },
@@ -87,8 +87,22 @@ export default createStore({
         },
     }
 
-}
+  }
   
 })
 
+store.registerModule(['aCount', 'cCount'], {
+  namespaced: true,
+  state: {
+      count: 100,
+  },
+  mutations: {
+      add(state, payload) {
+          state.count += payload
+      }
+  },
+})
+
+
+export default store
 

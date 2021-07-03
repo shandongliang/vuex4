@@ -16,7 +16,7 @@ function installModule (store, rootState, path, module){ //递归安装
 		let parentState = path.slice(0, -1).reduce((state, key) => {
 			return state[key]
 		}, rootState)
-		parentState[path[path.length - 1]] = module.state
+		store._withCommit(() => parentState[path[path.length - 1]] = module.state)
 	}
 
 	
@@ -150,7 +150,21 @@ export default class Store {
 		app.provide(injectKey || storeKey, this)
 		
 		// Vue.prototype.$store = this vue2的写法
-		app.config.globalProperties.$store = this //增添￥store属性
+		app.config.globalProperties.$store = this //增添Sstore属性
+	}
+
+	registerModule(path, rawModule){
+		const store = this
+		if(typeof path === 'string') path = [path]
+
+		// 要在原有的模块基础上新增一个
+		const newModule = store._module.register(rawModule, path) //注册上去
+
+		// 把模块安装上
+		installModule(store, store.state, path, newModule)
+
+		// 重置容器
+		resetStoreState(store, store.state)
 	}
 }
 

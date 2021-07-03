@@ -7,6 +7,7 @@ export default class ModuleCollection {
 		this.register(rootModule, [])
 	}
 
+    // 根据path，往父节点上注册新的模块
 	register(rawModule, path){
 		const newModule = new Module(rawModule)
 		if(path.length === 0){ //是一个根模块
@@ -25,6 +26,8 @@ export default class ModuleCollection {
 				this.register(rawChildModule, path.concat(key))
 			})
 		}
+
+        return newModule
 	}
 
     // 增加命名空间
